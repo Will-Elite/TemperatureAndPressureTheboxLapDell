@@ -3,6 +3,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var cors = require('cors'); // Thêm dòng này
 var { getLastRecord } = require('./getdataServer'); // Gọi hàm từ file getdataServer.js
+
 var startDataFetch = require('./writedataToServer').startDataFetch; // Gọi hàm từ file writedataToServer.js
 
 var app = express();
@@ -18,7 +19,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Thêm dòng này để phục vụ các file tĩnh từ thư mục 'public'
 //app.use(express.static('public'));
 
-// Định nghĩa route để lấy dữ liệu
+
+//Định nghĩa route để lấy dữ liệu
 app.get('/last-record', (req, res) => {
     getLastRecord((err, data) => {
         if (err) {
@@ -28,6 +30,7 @@ app.get('/last-record', (req, res) => {
         }
     });
 });
+
 
 // Khởi động quá trình lấy dữ liệu
 startDataFetch();

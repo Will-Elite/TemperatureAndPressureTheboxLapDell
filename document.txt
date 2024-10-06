@@ -5,6 +5,7 @@ npm install node-fetch
 npm install express
 npm install cors
 npm install node-fetch@2
+npm install axios
 
 
 code server.js ok có lấy dữ liệu
@@ -97,3 +98,84 @@ app.listen(port, () => {
 });
 /////////////////////////////////////////////
 
+ const query = `SELECT [id], [DeviceName], [Temperature], [Pressure], [timedate] 
+                   FROM [Testdb].[dbo].[Devices]`; // Lấy tất cả dữ liệu
+
+
+
+//////////////////////////////////////////////////////
+
+var Connection = require('tedious').Connection;
+var Request = require('tedious').Request;
+var TYPES = require('tedious').TYPES;
+
+// Cấu hình kết nối
+var config = {
+    server: 'localhost',
+    authentication: {
+        type: 'default',
+        options: {
+            userName: 'sa',
+            password: '123456'
+        }
+    },
+    options: {
+        trustServerCertificate: true,
+        database: 'Testdb'
+    }
+};
+
+// Hàm lấy 1 bản ghi từ bảng Devices
+function getOneRecord() {
+    const query = `SELECT * FROM [Testdb].[dbo].[Devices];`;
+
+    // Tạo kết nối
+    var connection = new Connection(config);
+
+    connection.on('connect', function(err) {
+        if (err) {
+            console.error('Connection error:', err); // In lỗi kết nối
+            return;
+        }
+        
+        console.log('Connected to SQL Server');
+        
+        // Tạo yêu cầu
+        const request = new Request(query, function(err, rowCount, rows) {
+            if (err) {
+                console.error('Request error:', err); // In lỗi yêu cầu
+            } else {
+                console.log(`Retrieved ${rowCount} row(s)`); // In số bản ghi đã lấy
+            }
+        });
+
+        // Xử lý dữ liệu trả về
+        request.on('row', function(columns) {
+            let result = {};
+            columns.forEach(function(column) {
+                result[column.metadata.colName] = column.value;
+            });
+            // In ra kết quả dưới dạng JSON
+            console.log("Record retrieved:");
+            console.log(JSON.stringify(result, null, 2)); // In ra định dạng JSON
+        });
+
+        // Gọi callback với tất cả dữ liệu khi hoàn thành
+        request.on('done', function() {
+            // Đóng kết nối
+            connection.close();
+            // Sau khi hoàn thành, tự động thoát
+            process.exit();
+        });
+
+        // Thực thi yêu cầu
+        connection.execSql(request);
+    });
+
+    connection.connect();
+}
+
+// Gọi hàm để lấy dữ liệu
+getOneRecord();
+
+////////////////////////////////////////////////////////

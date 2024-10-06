@@ -13,7 +13,7 @@ function formatDateTime(isoDate) {
     const year = date.getUTCFullYear();
 
     // Định dạng lại
-    return `${hours}:${minutes}:${seconds} Date: ${day}-${month}-${year}`;
+    return `${hours}:${minutes}:${seconds} <strong>Date:</strong> ${day}-${month}-${year}`;
 }
 
 // Hàm để lấy dữ liệu từ API và hiển thị lên trang
@@ -35,18 +35,33 @@ async function fetchLastRecord() {
             <p><strong>Device Name:</strong> ${data.DeviceName}</p>
             <p><strong>Temperature:</strong> ${data.Temperature} °C</p>
             <p><strong>Pressure:</strong> ${data.Pressure} Bar</p>
-            <p><strong>Date Time:</strong> ${formattedDateTime}</p>
+            <p><strong>Time:</strong> ${formattedDateTime}</p>
         `;
         // Hiển thị nhiệt độ và áp suất
         const tempContainer = document.getElementById('Temp');
         tempContainer.innerHTML = `${data.Temperature} °C`; // Hiển thị nhiệt độ
 
         const presContainer = document.getElementById('Pres');
-        presContainer.innerHTML = `${data.Pressure} hPa`; // Hiển thị áp suất
+        presContainer.innerHTML = `${data.Pressure} Bar`; // Hiển thị áp suất
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);
     }
 }
 
 // Gọi hàm fetchLastRecord khi trang được tải
-window.onload = fetchLastRecord;
+window.onload = function() {
+    fetchLastRecord(); // Lần đầu gọi ngay khi tải trang
+
+    // Cật nhật dữ liệu mỗi 1 giây
+    setInterval(fetchLastRecord, 10000);
+
+    // Lấy nút refresh và gắn sự kiện click
+    document.getElementById('refresh').addEventListener('click', refresh); 
+    
+    
+    // Gọi nút refresh mỗi giây một lần
+    setInterval(function() {
+        document.getElementById('refresh').click(); // Gọi sự kiện click của nút refresh
+        console.log('Refresh button clicked!');
+    }, 10000); // 1000ms = 1s
+};

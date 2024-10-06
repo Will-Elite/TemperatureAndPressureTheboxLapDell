@@ -5,4 +5,39 @@
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 5px;
+    display: flex; /* Sử dụng Flexbox để chia thành hai cột */
+    justify-content: space-between; /* Tạo khoảng cách giữa các phần */
+    align-items: flex-start; /* Căn các phần tử theo chiều dọc */
+}
+
+.Last-Record {
+    width: 48%;/* Chia mỗi phần chiếm khoảng 48% chiều rộng, thêm khoảng cách giữa chúng */
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Tạo hiệu ứng bóng đổ */
+    border-radius: 8px;
+    height: 300px;
+    overflow: auto; /* Thêm thanh cuộn nếu nội dung vượt quá chiều cao */
+}
+
+.content-group {
+    height: 300px;
+}
+
+.content-up {
+    padding: 10px; /* Thêm một chút đệm nếu cần */
+    height: 70%; 
+}
+
+.content-down {
+    height: 30%;
+}
+
+#recordContainer {
+    flex: 0 0 80%; /* Chiếm 60% chiều cao của Last-Record */
+    background-color: #f0f0f0; /* Thay đổi màu nền để dễ nhìn thấy, có thể tùy chỉnh */
+}
+
+.esp32-report {
+    flex: 0 0 40%; /* Chiếm 40% chiều cao của Last-Record */
+    background-color: #d9edf7; /* Thay đổi màu nền để dễ nhìn thấy, có thể tùy chỉnh */
 }

@@ -11,6 +11,7 @@ body {
 .gauge-section {
 	display: inline-block;
 	text-align: center;
+	margin-top: 20px;
 }
 
 .gauge-section h3 {
@@ -19,6 +20,9 @@ body {
 
 .gauge {
 	display: inline-block;
+	margin-top: 10px;
+    height: 150px;
+    width: 150px;
 }
 
 .actions {
