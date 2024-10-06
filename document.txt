@@ -1,0 +1,99 @@
+Hướng dẫn cài tedious
+npm init -y
+npm install tedious
+npm install node-fetch
+npm install express
+npm install cors
+npm install node-fetch@2
+
+
+code server.js ok có lấy dữ liệu
+/////////////////////////////////
+var express = require('express');
+var bodyParser = require('body-parser');
+var Connection = require('tedious').Connection;
+var Request = require('tedious').Request;
+var TYPES = require('tedious').TYPES;
+
+var app = express();
+var port = 3000;
+
+// Cấu hình body-parser để xử lý JSON
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Tạo kết nối tới cơ sở dữ liệu
+var config = {
+    server: 'localhost',
+    authentication: {
+        type: 'default',
+        options: {
+            userName: 'sa',
+            password: '123456'
+        }
+    },
+    options: {
+        trustServerCertificate: true,
+        database: 'Testdb'
+    }
+};
+
+// Hàm lấy dữ liệu cuối cùng từ bảng Devices
+function getLastRecord(callback) {
+    const query = `SELECT TOP 1 [id], [DeviceName], [Temperature], [Pressure], [timedate] 
+                   FROM [Testdb].[dbo].[Devices] 
+                   ORDER BY [timedate] DESC`;
+
+    // Tạo kết nối
+    var connection = new Connection(config);
+
+    connection.on('connect', function(err) {
+        if (err) {
+            console.log(err);
+            callback(err, null);
+        } else {
+            console.log('Connected');
+            // Tạo yêu cầu
+            const request = new Request(query, function(err, rowCount, rows) {
+                if (err) {
+                    console.error(err);
+                    callback(err, null);
+                } else {
+                    console.log(`Retrieved ${rowCount} row(s)`);
+                }
+            });
+
+            // Xử lý dữ liệu trả về
+            request.on('row', function(columns) {
+                let result = {};
+                columns.forEach(function(column) {
+                    result[column.metadata.colName] = column.value;
+                });
+                callback(null, result); // Gọi callback với dữ liệu
+            });
+
+            // Thực thi yêu cầu
+            connection.execSql(request);
+        }
+    });
+
+    connection.connect();
+}
+
+// Định nghĩa route để lấy dữ liệu
+app.get('/last-record', (req, res) => {
+    getLastRecord((err, data) => {
+        if (err) {
+            res.status(500).send('Error fetching data');
+        } else {
+            res.json(data); // Trả dữ liệu dưới dạng JSON
+        }
+    });
+});
+
+// Bắt đầu server
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});
+/////////////////////////////////////////////
+
